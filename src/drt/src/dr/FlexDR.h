@@ -34,6 +34,7 @@
 #include <boost/serialization/export.hpp>
 #include <deque>
 #include <memory>
+#include <vector>
 
 #include "db/drObj/drMarker.h"
 #include "db/drObj/drNet.h"
@@ -295,11 +296,6 @@ class FlexDRWorker
         rq_(this)
   {
   }
-  FlexDRWorker()
-      :  // for serialization
-        rq_(this)
-  {
-  }
   // setters
   void setDebugSettings(frDebugSettings* settings)
   {
@@ -449,11 +445,13 @@ class FlexDRWorker
     logger_ = logger;
     gridGraph_.setLogger(logger);
   }
+  void setRouterCfg(RouterConfiguration* in) { router_cfg_ = in; }
 
   static std::unique_ptr<FlexDRWorker> load(const std::string& workerStr,
-                                            utl::Logger* logger,
+                                            FlexDRViaData* via_data,
                                             frDesign* design,
-                                            FlexDRGraphics* graphics);
+                                            utl::Logger* logger,
+                                            RouterConfiguration* router_cfg);
 
   // distributed
   void setDistributed(dst::Distributed* dist,
@@ -729,17 +727,14 @@ class FlexDRWorker
   void initNets_boundaryArea();
 
   void initGridGraph(const frDesign* design);
-  void initTrackCoords(
-      std::map<frCoord, std::map<frLayerNum, frTrackPattern*>>& xMap,
-      std::map<frCoord, std::map<frLayerNum, frTrackPattern*>>& yMap);
-  void initTrackCoords_route(
-      drNet* net,
-      std::map<frCoord, std::map<frLayerNum, frTrackPattern*>>& xMap,
-      std::map<frCoord, std::map<frLayerNum, frTrackPattern*>>& yMap);
-  void initTrackCoords_pin(
-      drNet* net,
-      std::map<frCoord, std::map<frLayerNum, frTrackPattern*>>& xMap,
-      std::map<frCoord, std::map<frLayerNum, frTrackPattern*>>& yMap);
+  void initTrackCoords(frLayerCoordTrackPatternMap& xMap,
+                       frLayerCoordTrackPatternMap& yMap);
+  void initTrackCoords_route(drNet* net,
+                             frLayerCoordTrackPatternMap& xMap,
+                             frLayerCoordTrackPatternMap& yMap);
+  void initTrackCoords_pin(drNet* net,
+                           frLayerCoordTrackPatternMap& xMap,
+                           frLayerCoordTrackPatternMap& yMap);
   void initMazeIdx();
   void initMazeIdx_connFig(drConnFig* connFig);
   void initMazeIdx_ap(drAccessPattern* ap);
@@ -867,19 +862,13 @@ class FlexDRWorker
   void modMinSpacingCostVia_eol(const Rect& box,
                                 const Rect& tmpBx,
                                 ModCostType type,
-                                bool isUpperVia,
                                 const drEolSpacingConstraint& drCon,
-                                frMIdx i,
-                                frMIdx j,
-                                frMIdx z,
+                                frMIdx idx,
                                 bool ndr = false);
   void modMinSpacingCostVia_eol_helper(const Rect& box,
                                        const Rect& testBox,
                                        ModCostType type,
-                                       bool isUpperVia,
-                                       frMIdx i,
-                                       frMIdx j,
-                                       frMIdx z,
+                                       frMIdx idx,
                                        bool ndr = false);
   // eolSpc
   void modEolSpacingCost_helper(const Rect& testbox,

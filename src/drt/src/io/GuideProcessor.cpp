@@ -75,9 +75,8 @@ std::string getPinName(const frBlockObject* pin)
 {
   if (pin->typeId() == frcBTerm) {
     return static_cast<const frBTerm*>(pin)->getName();
-  } else {
-    return static_cast<const frInstTerm*>(pin)->getName();
   }
+  return static_cast<const frInstTerm*>(pin)->getName();
 }
 /**
  * Returns the preferred access point for required pin.
@@ -989,7 +988,6 @@ void GuideProcessor::patchGuides(frNet* net,
   // no guide was found that overlaps with any of the pin shapes, then we patch
   // the guides
 
-  const std::string name = getPinName(pin);
   const Point3D best_pin_loc_idx
       = findBestPinLocation(getDesign(), pin, guides);
   // The x/y/z coordinates of best_pin_loc_idx

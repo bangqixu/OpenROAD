@@ -41,7 +41,10 @@
 #include <variant>
 #include <vector>
 
+#include "dbBlockSet.h"
+#include "dbCCSegSet.h"
 #include "dbMatrix.h"
+#include "dbNetSet.h"
 #include "dbObject.h"
 #include "dbSet.h"
 #include "dbTypes.h"
@@ -108,7 +111,6 @@ class dbSite;
 class dbMaster;
 class dbMTerm;
 class dbMPin;
-class dbTarget;
 class dbGDSLib;
 
 // Tech objects
@@ -147,6 +149,7 @@ class dbLevelShifter;
 class dbLogicPort;
 class dbMarker;
 class dbMarkerCategory;
+class dbMasterEdgeType;
 class dbMetalWidthViaMap;
 class dbModBTerm;
 class dbModInst;
@@ -1725,17 +1728,6 @@ class dbBlock : public dbObject
                          const char* name,
                          dbTech* tech = nullptr,
                          char hier_delimeter = 0);
-
-  ///
-  /// duplicate - Make a duplicate of the specified "child" block. If name ==
-  /// nullptr, the name of the block is also duplicated. If the duplicated block
-  /// does not have a unique name, then "findChild" may return an incorrect
-  /// block. UNIQUE child-block-names are not enforced! (This should be fixed)!
-  ///
-  /// A top-block can not be duplicated. This methods returns nullptr if the
-  /// specified block has not parent.
-  ///
-  static dbBlock* duplicate(dbBlock* block, const char* name = nullptr);
 
   ///
   /// Translate a database-id back to a pointer.
@@ -5713,6 +5705,11 @@ class dbMaster : public dbObject
   dbSet<dbMTerm> getMTerms();
 
   ///
+  /// Get the LEF58_EDGETYPE properties.
+  ///
+  dbSet<dbMasterEdgeType> getEdgeTypes();
+
+  ///
   /// Find a specific master-terminal
   /// Returns nullptr if the object was not found.
   ///
@@ -5904,11 +5901,6 @@ class dbMTerm : public dbObject
   Rect getBBox();
 
   ///
-  /// Get the target points of this terminal.
-  ///
-  dbSet<dbTarget> getTargets();
-
-  ///
   /// Add antenna info that is not specific to an oxide model.
   ///
   void addPartialMetalAreaEntry(double inval, dbTechLayer* refly = nullptr);
@@ -6004,56 +5996,6 @@ class dbMPin : public dbObject
   /// Translate a database-id back to a pointer.
   ///
   static dbMPin* getMPin(dbMaster* master, uint oid);
-};
-
-///////////////////////////////////////////////////////////////////////////////
-///
-/// A Target is the element that represents a physical target point on a MTerm.
-///
-///////////////////////////////////////////////////////////////////////////////
-class dbTarget : public dbObject
-{
- public:
-  ///
-  /// Get the master this target belongs too.
-  ///
-  dbMaster* getMaster();
-
-  ///
-  /// Get the mterm this target
-  ///
-  dbMTerm* getMTerm();
-
-  ///
-  /// Get the tech-layer this target
-  ///
-  dbTechLayer* getTechLayer();
-
-  ///
-  /// Get the target point of this target.
-  ///
-  Point getPoint();
-
-  ///
-  /// Create a new master terminal.
-  /// Returns nullptr if a master terminal with this name already exists
-  ///
-  static dbTarget* create(dbMTerm* mterm, dbTechLayer* layer, Point point);
-
-  ///
-  /// Destroy a target
-  ///
-  static void destroy(dbTarget* t);
-
-  ///
-  /// Destroy a target
-  ///
-  static dbSet<dbTarget>::iterator destroy(dbSet<dbTarget>::iterator& itr);
-
-  ///
-  /// Translate a database-id back to a pointer.
-  ///
-  static dbTarget* getTarget(dbMaster* master, uint oid);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -8021,6 +7963,49 @@ class dbMarkerCategory : public dbObject
   static void destroy(dbMarkerCategory* category);
 
   // User Code End dbMarkerCategory
+};
+
+class dbMasterEdgeType : public dbObject
+{
+ public:
+  enum EdgeDir
+  {
+    TOP,
+    RIGHT,
+    LEFT,
+    BOTTOM
+  };
+
+  void setEdgeType(const std::string& edge_type);
+
+  std::string getEdgeType() const;
+
+  void setCellRow(int cell_row);
+
+  int getCellRow() const;
+
+  void setHalfRow(int half_row);
+
+  int getHalfRow() const;
+
+  void setRangeBegin(int range_begin);
+
+  int getRangeBegin() const;
+
+  void setRangeEnd(int range_end);
+
+  int getRangeEnd() const;
+
+  // User Code Begin dbMasterEdgeType
+  void setEdgeDir(dbMasterEdgeType::EdgeDir edge_dir);
+
+  dbMasterEdgeType::EdgeDir getEdgeDir() const;
+
+  static dbMasterEdgeType* create(dbMaster* master);
+
+  static void destroy(dbMasterEdgeType* edge_type);
+
+  // User Code End dbMasterEdgeType
 };
 
 class dbMetalWidthViaMap : public dbObject

@@ -39,6 +39,7 @@
 #include <fstream>
 #include <random>
 #include <sstream>
+#include <vector>
 
 #include "AbstractIOPlacerRenderer.h"
 #include "Core.h"
@@ -256,14 +257,12 @@ void IOPlacer::randomPlacement(std::vector<int> pin_indices,
                     pin_indices.size());
       addGroupToFallback(pin_indices, false);
       return;
-    } else {
-      logger_->error(
-          PPL,
-          72,
-          "Number of pins ({}) exceed number of valid positions ({}).",
-          pin_indices.size(),
-          slot_indices.size());
     }
+    logger_->error(PPL,
+                   72,
+                   "Number of pins ({}) exceed number of valid positions ({}).",
+                   pin_indices.size(),
+                   slot_indices.size());
   }
 
   const auto seed = parms_->getRandSeed();

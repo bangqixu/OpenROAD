@@ -44,6 +44,7 @@
 #include <QSplitter>
 #include <QTableView>
 #include <memory>
+#include <vector>
 
 #include "gui/gui.h"
 #include "odb/db.h"
@@ -74,7 +75,7 @@ class TimingWidget : public QDockWidget
   };
 
   TimingWidget(QWidget* parent = nullptr);
-  ~TimingWidget();
+  ~TimingWidget() override;
 
   void init(sta::dbSta* sta);
 

@@ -106,6 +106,7 @@ enum dbObjectType
   dbLogicPortObj,
   dbMarkerObj,
   dbMarkerCategoryObj,
+  dbMasterEdgeTypeObj,
   dbMetalWidthViaMapObj,
   dbModBTermObj,
   dbModInstObj,
@@ -151,7 +152,6 @@ enum dbObjectType
   dbMasterObj,
   dbMPinObj,
   dbMTermObj,
-  dbTargetObj,
   dbTechAntennaPinModelObj,
 
   // Tech Objects
